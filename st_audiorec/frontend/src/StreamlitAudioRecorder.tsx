@@ -41,20 +41,18 @@ class StAudioRec extends StreamlitComponentBase<State> {
 
     return (
       <span>
-        <div>
-          <button id='record' onClick={this.onClick_start}>
-            Start Recording
-          </button>
-          <button id='stop' onClick={this.onClick_stop}>
-            Stop
-          </button>
-          <button id='reset' onClick={this.onClick_reset}>
-            Reset
-          </button>
-
-          <button id='continue' onClick={this.onClick_continue}>
-            Download
-          </button>
+        <div className=".audioRecorder">
+          {(!recordState || recordState === RecordState.STOP) && 
+            <button id='record' onClick={this.onClick_start}>
+              🎤 Start
+            </button>
+          }
+          
+          {recordState === RecordState.START &&
+            <button id='stop' onClick={this.onClick_stop} >
+              🎤 Stop
+            </button>
+          }
 
           <AudioReactRecorder
             state={recordState}
@@ -62,14 +60,8 @@ class StAudioRec extends StreamlitComponentBase<State> {
             type='audio/wav'
             backgroundColor='rgb(255, 255, 255)'
             foregroundColor='rgb(255,76,75)'
-            canvasWidth={450}
-            canvasHeight={100}
-          />
-
-          <audio
-            id='audio'
-            controls
-            src={this.state.audioDataURL}
+            canvasWidth={0}
+            canvasHeight={0}
           />
 
         </div>
@@ -92,35 +84,6 @@ class StAudioRec extends StreamlitComponentBase<State> {
       reset: false,
       recordState: RecordState.STOP
     })
-  }
-
-  private onClick_reset = () => {
-    this.setState({
-      reset: true,
-      audioDataURL: '',
-      recordState: RecordState.STOP
-    })
-    Streamlit.setComponentValue('')
-  }
-
-  private onClick_continue = () => {
-    if (this.state.audioDataURL !== '')
-    {
-      // get datetime string for filename
-      let datetime = new Date().toLocaleString();
-      datetime = datetime.replace(' ', '');
-      datetime = datetime.replace(/_/g, '');
-      datetime = datetime.replace(',', '');
-      var filename = 'streamlit_audio_' + datetime + '.wav';
-
-      // auromatically trigger download
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = this.state.audioDataURL;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-    }
   }
 
   private onStop_audio = (data) => {
